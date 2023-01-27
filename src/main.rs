@@ -1,5 +1,5 @@
 pub mod aoc2022;
 
 fn main() {
-	aoc2022::day_1::calorie_counting();
+	println!("{}", aoc2022::day_1::calorie_counting_part_2());
 }
