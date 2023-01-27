@@ -1,5 +1,5 @@
 pub mod aoc2022;
 
 fn main() {
-    println!("Hello, world!");
+	aoc2022::day_1::calorie_counting();
 }
