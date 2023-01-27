@@ -1,4 +1,4 @@
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Eq, Debug, Clone)]
 enum Play {
 	Rock,
 	Paper,
@@ -20,8 +20,8 @@ impl Play {
 		}
 	}
 
-	pub fn from(s: char) -> Self {
-		match s {
+	pub fn interpret_part_1(c: char) -> Self {
+		match c {
 			'A' | 'X' => Self::Rock,
 			'B' | 'Y' => Self::Paper,
 			'C' | 'Z' => Self::Scissor,
@@ -29,27 +29,53 @@ impl Play {
 		}
 	}
 
-	pub fn cmp(you: &Self, opponent: &Self) -> Outcome {
-		if you == opponent {
+	// Might have been unnecessary, but oh well, foolproof
+	pub fn interpret_part_2(c: char) -> Self {
+		match c {
+			'A' => Self::Rock,
+			'B' => Self::Paper,
+			'C' => Self::Scissor,
+			_ => panic!("Illegal string argument"),
+		}
+	}
+
+	pub fn interacted_to(&self, out: Outcome) -> Self {
+		match out {
+			Outcome::Draw => self.clone(),
+			Outcome::Lose => match self {
+				Play::Rock => Play::Scissor,
+				Play::Paper => Play::Rock,
+				Play::Scissor => Play::Paper,
+			},
+			Outcome::Win => match self {
+				Play::Rock => Play::Paper,
+				Play::Paper => Play::Scissor,
+				Play::Scissor => Play::Rock,
+			},
+		}
+	}
+
+	pub fn cmp(you: &Self, them: &Self) -> Outcome {
+		if you == them {
 			Outcome::Draw
 		} else {
 			match you {
 				Play::Rock => {
-					if opponent == &Play::Scissor {
+					if them == &Play::Scissor {
 						Outcome::Win
 					} else {
 						Outcome::Lose
 					}
 				},
 				Play::Paper => {
-					if opponent == &Play::Rock {
+					if them == &Play::Rock {
 						Outcome::Win
 					} else {
 						Outcome::Lose
 					}
 				},
 				Play::Scissor => {
-					if opponent == &Play::Paper {
+					if them == &Play::Paper {
 						Outcome::Win
 					} else {
 						Outcome::Lose
@@ -76,24 +102,41 @@ impl Outcome {
 			Outcome::Lose => 0,
 		}
 	}
+
+	pub fn interpret_part_2(c: char) -> Self {
+		match c {
+			'X' => Outcome::Lose,
+			'Y' => Outcome::Draw,
+			'Z' => Outcome::Win,
+			_ => panic!("Illegal string argument"),
+		}
+	}
 }
 
 #[derive(Debug)]
 struct Match {
 	pub you: Play,
-	pub opponent: Play,
+	pub them: Play,
 }
 
 impl Match {
-	pub fn from(s: &str) -> Self {
+	pub fn interpret_part_1(literal: &str) -> Self {
 		Self {
-			you: Play::from(s.chars().nth(2).unwrap()),
-			opponent: Play::from(s.chars().next().unwrap()),
+			you: Play::interpret_part_1(literal.chars().nth(2).unwrap()),
+			them: Play::interpret_part_1(literal.chars().next().unwrap()),
+		}
+	}
+
+	pub fn interpret_part_2(literal: &str) -> Self {
+		let them = Play::interpret_part_2(literal.chars().next().unwrap());
+		Self {
+			you: them.interacted_to(Outcome::interpret_part_2(literal.chars().nth(2).unwrap())),
+			them,
 		}
 	}
 
 	pub fn outcome(&self) -> Outcome {
-		Play::cmp(&self.you, &self.opponent)
+		Play::cmp(&self.you, &self.them)
 	}
 
 	pub fn score(&self) -> u8 {
@@ -101,16 +144,24 @@ impl Match {
 	}
 }
 
-fn matches() -> Vec<Match> {
-	std::fs::read_to_string("res/aoc2022/day_2.txt").unwrap().lines().map(Match::from).collect()
+fn match_literals() -> Vec<String> {
+	std::fs::read_to_string("res/aoc2022/day_2.txt").unwrap().lines().map(str::to_string).collect()
 }
 
 pub fn rock_paper_scissors_part_1() -> u64 {
-	matches()
+	match_literals()
 		.iter()
-		.map(|m| {
-			println!("{m:#?} = {}", m.score());
-			m.score() as u64
-		})
+		.map(String::as_str)
+		.map(Match::interpret_part_1)
+		.map(|m| m.score() as u64)
+		.sum()
+}
+
+pub fn rock_paper_scissors_part_2() -> u64 {
+	match_literals()
+		.iter()
+		.map(String::as_str)
+		.map(Match::interpret_part_2)
+		.map(|m| m.score() as u64)
 		.sum()
 }
