@@ -63,10 +63,7 @@ fn rucksack_intersection(a: &Rucksack, b: &Rucksack) -> Vec<u8> {
 
 fn three_way_intersection(rucksacks: Vec<&Rucksack>) -> Option<u8> {
 	let (a, b, c) = (rucksacks[0], rucksacks[1], rucksacks[2]);
-	let (ab, bc) = (
-		rucksack_intersection(a, b),
-		rucksack_intersection(b, c),
-	);
+	let (ab, bc) = (rucksack_intersection(a, b), rucksack_intersection(b, c));
 	let set_ab: HashSet<&u8> = HashSet::from_iter(ab.iter());
 	let set_bc: HashSet<&u8> = HashSet::from_iter(bc.iter());
 	set_ab.intersection(&set_bc).next().map(|item| **item)
