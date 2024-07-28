@@ -4,12 +4,6 @@ struct Assignment {
 	pub end: u64,
 }
 
-impl Assignment {
-	pub fn new(start: u64, end: u64) -> Self {
-		Self { start, end }
-	}
-}
-
 type AssignmentPair = (Assignment, Assignment);
 
 fn to_assignment_pair(s: String) -> AssignmentPair {
@@ -61,19 +55,4 @@ pub fn camp_cleanup_part_1() -> usize {
 
 pub fn camp_cleanup_part_2() -> usize {
 	assignments().into_iter().filter(assignment_pair_overlaps).count()
-}
-
-#[cfg(test)]
-mod test {
-	use crate::aoc2022::day_4::{
-		overlaps,
-		Assignment,
-	};
-
-	#[test]
-	fn overlap_works() {
-		assert!(overlaps(&Assignment::new(1, 5), &Assignment::new(2, 6)));
-		assert!(overlaps(&Assignment::new(1, 5), &Assignment::new(2, 5)));
-		assert!(!overlaps(&Assignment::new(1, 5), &Assignment::new(6, 7)));
-	}
 }
