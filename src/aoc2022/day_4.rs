@@ -1,17 +1,20 @@
+#[derive(Clone, Copy)]
 struct Assignment {
 	pub start: u64,
 	pub end: u64,
 }
 
-fn assignment_pair_overlaps(pair: &Vec<Assignment>) -> bool {
-	fn compare(x: &Assignment, y: &Assignment) -> bool {
-		x.start <= y.start && x.end >= y.end
+impl Assignment {
+	pub fn new(start: u64, end: u64) -> Self {
+		Self { start, end }
 	}
-	compare(&pair[0], &pair[1]) || compare(&pair[1], &pair[0])
 }
 
-fn to_assignment_pair(s: String) -> Vec<Assignment> {
-	s.split(',')
+type AssignmentPair = (Assignment, Assignment);
+
+fn to_assignment_pair(s: String) -> AssignmentPair {
+	let vec = s
+		.split(',')
 		.map(|assignment| {
 			let indices = assignment
 				.split('-')
@@ -23,11 +26,12 @@ fn to_assignment_pair(s: String) -> Vec<Assignment> {
 				end: indices[1],
 			}
 		})
-		.collect()
+		.collect::<Vec<_>>();
+	(vec[0], vec[1])
 }
 
-fn assignments() -> Vec<Vec<Assignment>> {
-	std::fs::read_to_string("res/aoc2022/day_4.txt")
+fn assignments() -> Vec<AssignmentPair> {
+	std::fs::read_to_string("input/aoc2022/day_4.txt")
 		.unwrap()
 		.lines()
 		.map(str::to_string)
@@ -35,9 +39,41 @@ fn assignments() -> Vec<Vec<Assignment>> {
 		.collect()
 }
 
+fn contains(x: &Assignment, y: &Assignment) -> bool {
+	x.start <= y.start && x.end >= y.end
+}
+
+fn assignment_pair_fully_contains(pair: &AssignmentPair) -> bool {
+	contains(&pair.0, &pair.1) || contains(&pair.1, &pair.0)
+}
+
+fn overlaps(x: &Assignment, y: &Assignment) -> bool {
+	x.start < y.start && x.end >= y.start
+}
+
+fn assignment_pair_overlaps(pair: &AssignmentPair) -> bool {
+	overlaps(&pair.0, &pair.1) || overlaps(&pair.1, &pair.0) || assignment_pair_fully_contains(pair)
+}
+
 pub fn camp_cleanup_part_1() -> usize {
-    assignments()
-        .into_iter()
-        .filter(assignment_pair_overlaps)
-        .count()
+	assignments().into_iter().filter(assignment_pair_fully_contains).count()
+}
+
+pub fn camp_cleanup_part_2() -> usize {
+	assignments().into_iter().filter(assignment_pair_overlaps).count()
+}
+
+#[cfg(test)]
+mod test {
+	use crate::aoc2022::day_4::{
+		overlaps,
+		Assignment,
+	};
+
+	#[test]
+	fn overlap_works() {
+		assert!(overlaps(&Assignment::new(1, 5), &Assignment::new(2, 6)));
+		assert!(overlaps(&Assignment::new(1, 5), &Assignment::new(2, 5)));
+		assert!(!overlaps(&Assignment::new(1, 5), &Assignment::new(6, 7)));
+	}
 }

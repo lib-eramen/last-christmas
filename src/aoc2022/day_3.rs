@@ -70,7 +70,7 @@ fn three_way_intersection(rucksacks: Vec<&Rucksack>) -> Option<u8> {
 }
 
 fn rucksacks() -> Vec<Rucksack> {
-	std::fs::read_to_string("res/aoc2022/day_3.txt")
+	std::fs::read_to_string("input/aoc2022/day_3.txt")
 		.unwrap()
 		.lines()
 		.map(str::to_string)

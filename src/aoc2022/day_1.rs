@@ -1,5 +1,5 @@
 fn calories_per_elf() -> Vec<u64> {
-	std::fs::read_to_string("res/aoc2022/day_1.txt")
+	std::fs::read_to_string("input/aoc2022/day_1.txt")
 		.unwrap()
 		.split("\n\n")
 		.map(|elf| {

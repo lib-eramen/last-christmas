@@ -145,7 +145,11 @@ impl Match {
 }
 
 fn match_literals() -> Vec<String> {
-	std::fs::read_to_string("res/aoc2022/day_2.txt").unwrap().lines().map(str::to_string).collect()
+	std::fs::read_to_string("input/aoc2022/day_2.txt")
+		.unwrap()
+		.lines()
+		.map(str::to_string)
+		.collect()
 }
 
 pub fn rock_paper_scissors_part_1() -> u64 {
