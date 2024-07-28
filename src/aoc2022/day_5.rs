@@ -12,13 +12,26 @@ struct Supplies {
 }
 
 impl Supplies {
-	fn apply(&mut self, instruction: Instruction) {
+	fn apply_9000(&mut self, instruction: Instruction) {
 		let mut stack_from = self.stacks[instruction.from].clone();
 		let mut stack_to = self.stacks[instruction.to].clone();
 		stack_to.append(
 			&mut stack_from
 				.drain::<RangeFrom<usize>>(stack_from.len() - instruction.amount as usize..)
 				.rev()
+				.take(instruction.amount.into())
+				.collect(),
+		);
+		self.stacks[instruction.from] = stack_from;
+		self.stacks[instruction.to] = stack_to;
+	}
+
+	fn apply_9001(&mut self, instruction: Instruction) {
+		let mut stack_from = self.stacks[instruction.from].clone();
+		let mut stack_to = self.stacks[instruction.to].clone();
+		stack_to.append(
+			&mut stack_from
+				.drain::<RangeFrom<usize>>(stack_from.len() - instruction.amount as usize..)
 				.take(instruction.amount.into())
 				.collect(),
 		);
@@ -119,7 +132,15 @@ fn input() -> (Supplies, Vec<Instruction>) {
 pub fn supply_stack_part_1() -> String {
 	let (mut supplies, instructions) = input();
 	for instruction in instructions {
-		supplies.apply(instruction);
+		supplies.apply_9000(instruction);
+	}
+	supplies.top_level()
+}
+
+pub fn supply_stack_part_2() -> String {
+	let (mut supplies, instructions) = input();
+	for instruction in instructions {
+		supplies.apply_9001(instruction);
 	}
 	supplies.top_level()
 }
